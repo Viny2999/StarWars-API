@@ -18,7 +18,7 @@ public class PlanetController {
     @Autowired
     private PlanetRepository repository;
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public List<Planet> getAllPlanet() {
         return repository.findAll();
     }
@@ -35,7 +35,7 @@ public class PlanetController {
         repository.save(planet);
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.POST)
+    @RequestMapping(value = "", method = RequestMethod.POST)
     public Planet createPlanet(@Valid @RequestBody Planet planet) {
         planet.set_id(ObjectId.get());
         repository.save(planet);
