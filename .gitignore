@@ -3,6 +3,15 @@ HELP.md
 /build/
 !gradle/wrapper/gradle-wrapper.jar
 
+### MacBook ###
+.DS_Store
+*/.DS_Store
+*/*/.DS_Store
+*/*/*/.DS_Store
+*/*/*/*/.DS_Store
+*/*/*/*/*/.DS_Store
+*/*/*/*/*/*/.DS_Store
+
 ### STS ###
 .apt_generated
 .classpath
@@ -28,3 +37,4 @@ HELP.md
 
 ### VS Code ###
 .vscode/
+
