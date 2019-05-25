@@ -8,7 +8,7 @@ Run `gradle bootRun` to start
 # Endpoints
 Get all planets: `GET localhost:8080/planets`
 
-Search by ID: GET localhost:8080/planets/<ID>`
+Search by ID: `GET localhost:8080/planets/<ID>`
 
 Search by Name: `GET localhost:8080/planets/search/<NAME>`
 
