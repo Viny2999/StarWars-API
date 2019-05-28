@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PlanetRepository extends MongoRepository<Planet, String> {
- Planet findById(Integer id);
+  Planet findById(Integer id);
 
- @Query(value = "{name: ?0}")
- Planet findByName(String name);
+  @Query(value = "{name: ?0}")
+  Planet findByName(String name);
 }
