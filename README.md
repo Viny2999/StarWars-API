@@ -10,11 +10,9 @@ Get all planets: `GET localhost:8080/planets`
 
 Search by ID: `GET localhost:8080/planets/<ID>`
 
-Search by Name: `GET localhost:8080/planets/search/<NAME>`
+Search by Name: `GET localhost:8080/planets/name/<NAME>`
 
 Post a planet: `POST localhost:8080/planets`
-
-Put a planet: `PUT localhost:8080/planets/<ID>`
 
 Delete a planet: `DELETE localhost:8080/planets/<ID>`
 
