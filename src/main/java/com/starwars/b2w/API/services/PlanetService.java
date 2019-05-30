@@ -39,6 +39,11 @@ public class PlanetService {
   public ResponseEntity getPlanetById(Integer id) {
     try {
       Planet planet = planetRepository.findById(id);
+
+      if(planet == null) {
+        throw new Exception();
+      }
+
       return requestSWAPI(planet);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"Planet not Found\"}");
@@ -48,6 +53,11 @@ public class PlanetService {
   public ResponseEntity getPlanetByName(String name) {
     try {
       Planet planet = planetRepository.findByName(name);
+
+      if(planet == null) {
+        throw new Exception();
+      }
+
       return requestSWAPI(planet);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"Planet not Found\"}");
