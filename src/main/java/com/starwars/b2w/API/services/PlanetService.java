@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.json.JSONObject;
 
@@ -26,58 +27,80 @@ public class PlanetService {
   @Value("${swapi.url}")
   private String SWAPI_URL;
 
-  public List<Planet> getAllPlanets () {
-    List<Planet> planets = planetRepository.findAll(Sort.by(Sort.Direction.ASC, "_id"));
-
-    return planets;
-  }
-
-  public String getPlanetById(Integer id) {
-    Planet planet = planetRepository.findById(id);
-
-    return requestSWAPI(planet);
-  }
-
-  public String getPlanetByName(String name) {
-    Planet planet = planetRepository.findByName(name);
-
-    return requestSWAPI(planet);
-  }
-
-  public ResponseEntity createPlanet(Planet planet) {
-    if(!checkPlanet(planet)) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing Information");
+  public ResponseEntity getAllPlanets () {
+    try {
+      List<Planet> planets = planetRepository.findAll(Sort.by(Sort.Direction.ASC, "_id"));
+      return ResponseEntity.status(HttpStatus.OK).body(planets);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\":\"Internal Server Error\"}");
     }
-
-    Optional<Planet> planetOptional = planetRepository.findByNameOpt(planet.getName());
-
-    if (planetOptional.isPresent())
-      return ResponseEntity.status(HttpStatus.CONFLICT).body("Planet" + planet.getName() + "already exists");
-
-    List<Planet> planets = planetRepository.findAll();
-    planet.setId(new Integer(planets.size() + 1));
-    planetRepository.insert(planet);
-    return ResponseEntity.status(HttpStatus.CREATED).body("Planet Created");
   }
 
-  public void deletePlanet(Integer id) {
-    planetRepository.delete(planetRepository.findById(id));
+  public ResponseEntity getPlanetById(Integer id) {
+    try {
+      Planet planet = planetRepository.findById(id);
+      return requestSWAPI(planet);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"Planet not Found\"}");
+    }
   }
 
-  private String requestSWAPI(Planet planet) {
-    Object responseSWApi = restTemplate.exchange(SWAPI_URL + planet.getId(), HttpMethod.GET, headerGenerator(), Object.class);
+  public ResponseEntity getPlanetByName(String name) {
+    try {
+      Planet planet = planetRepository.findByName(name);
+      return requestSWAPI(planet);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"Planet not Found\"}");
+    }
+  }
 
-    JSONObject responseJson = new JSONObject(responseSWApi);
+  public ResponseEntity<String> createPlanet(Planet planet) {
+    try {
+      if (!checkPlanet(planet)) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\":\"Missing Information\"}");
+      }
 
-    JSONObject newPlanet = new JSONObject();
+      Optional<Planet> planetOptional = planetRepository.findByNameOpt(planet.getName());
 
-    newPlanet.put("id",  planet.getId());
-    newPlanet.put("name", planet.getName());
-    newPlanet.put("climate",  planet.getClimate());
-    newPlanet.put("terrain",  planet.getTerrain());
-    newPlanet.put("movies", responseJson.getJSONObject("body").getJSONArray("films"));
+      if (planetOptional.isPresent())
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"error\":\"Planet " + planet.getName() + " already exists\"}");
 
-    return newPlanet.toString();
+      List<Planet> planets = planetRepository.findAll();
+      planet.setId(new Integer(planets.size() + 1));
+      planetRepository.insert(planet);
+      return ResponseEntity.status(HttpStatus.CREATED).body("{\"success\":\"Planet Created\"}");
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\":\"Internal Server Error\"}");
+    }
+  }
+
+  public ResponseEntity deletePlanet(Integer id) {
+    try {
+      planetRepository.delete(planetRepository.findById(id));
+      return ResponseEntity.status(HttpStatus.OK).body("{\"success\":\"Planet Deleted\"}");
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"Planet not Found\"}");
+    }
+  }
+
+  private ResponseEntity requestSWAPI(Planet planet) {
+    try {
+      Object responseSWApi = restTemplate.exchange(SWAPI_URL + planet.getId(), HttpMethod.GET, headerGenerator(), Object.class);
+
+      JSONObject responseJson = new JSONObject(responseSWApi);
+
+      JSONObject newPlanet = new JSONObject();
+
+      newPlanet.put("id", planet.getId());
+      newPlanet.put("name", planet.getName());
+      newPlanet.put("climate", planet.getClimate());
+      newPlanet.put("terrain", planet.getTerrain());
+      newPlanet.put("movies", responseJson.getJSONObject("body").getJSONArray("films"));
+
+      return ResponseEntity.status(HttpStatus.OK).body(newPlanet.toString());
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\":\"SWAPI Unavailable\"}");
+    }
   }
 
   private HttpEntity headerGenerator() {
@@ -89,12 +112,8 @@ public class PlanetService {
   }
 
   private Boolean checkPlanet(Planet planet) {
-    if (
-        planet.getName().isEmpty() || planet.getName().equals(null) &&
-        planet.getClimate().isEmpty() || planet.getClimate().equals(null) &&
-        planet.getTerrain().isEmpty() || planet.getTerrain().equals(null)
-    ) return false;
-
-    return true;
+    return  !StringUtils.isEmpty(planet.getName()) &&
+            !StringUtils.isEmpty(planet.getClimate()) &&
+            !StringUtils.isEmpty(planet.getTerrain());
   }
 }
