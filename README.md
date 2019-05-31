@@ -15,3 +15,10 @@ Search by Name: `GET localhost:8080/planets/name/<NAME>`
 Post a planet: `POST localhost:8080/planets`
 
 Delete a planet: `DELETE localhost:8080/planets/<ID>`
+
+# Example of body to create planet
+{	
+	"name": "b2w",
+	"climate": "unknow",
+	"terrain": "unknow"
+}
