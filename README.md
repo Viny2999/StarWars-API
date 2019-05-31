@@ -15,6 +15,3 @@ Search by Name: `GET localhost:8080/planets/name/<NAME>`
 Post a planet: `POST localhost:8080/planets`
 
 Delete a planet: `DELETE localhost:8080/planets/<ID>`
-
-# Tests
-``
