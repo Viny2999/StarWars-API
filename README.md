@@ -1,6 +1,6 @@
 # Star WarsAPI
 
-A Simple Star Wars Java API usin Spring for a B2W challenge
+A Simple Star Wars Java API using Spring.
 
 # Instruction
 Run `gradle bootRun` to start
@@ -18,7 +18,7 @@ Delete a planet: `DELETE localhost:8080/planets/<ID>`
 
 # Example of body to create planet
 {	
-	"name": "b2w",
-	"climate": "unknow",
-	"terrain": "unknow"
+	"name": "name",
+	"climate": "unknown",
+	"terrain": "unknown"
 }
