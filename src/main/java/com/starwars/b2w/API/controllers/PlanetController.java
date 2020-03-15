@@ -20,9 +20,9 @@ public class PlanetController {
     return planetService.getAllPlanets();
   }
 
-  @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity getPlanetById(@PathVariable("id") Integer id) {
-    return planetService.getPlanetById(id);
+  @GetMapping(value = "/{index}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity getPlanetById(@PathVariable("index") Integer index) {
+    return planetService.getPlanetByIndex(index);
   }
 
   @GetMapping(value = "/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -35,8 +35,8 @@ public class PlanetController {
     return planetService.createPlanet(planet);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity deletePlanet(@PathVariable Integer id) {
-    return planetService.deletePlanet(id);
+  @DeleteMapping(value = "/{index}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity deletePlanet(@PathVariable Integer index) {
+    return planetService.deletePlanet(index);
   }
 }

@@ -15,7 +15,7 @@ public class MainController {
 
     JSONObject info = new JSONObject();
     info.put("apiName", "B2W Star Wars API");
-    info.put("createIn", "2019-05-24");
+    info.put("createIn", "2020-03-15");
     info.put("creator", "Vinícius Menezes");
 
     return info.toString();

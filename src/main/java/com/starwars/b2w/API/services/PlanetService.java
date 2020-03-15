@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
 public class PlanetService {
   @Autowired
@@ -36,35 +35,33 @@ public class PlanetService {
     }
   }
 
-  public ResponseEntity getPlanetById(Integer id) {
+  public ResponseEntity getPlanetByIndex(Integer index) {
     try {
-      Planet planet = planetRepository.findById(id);
+      Optional<Planet> planet = planetRepository.findByIndexOpt(index);
 
-      if(planet == null) {
-        throw new Exception();
-      }
+      if (planet.isEmpty())
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"Planet not Found\"}");
 
-      return requestSWAPI(planet);
+      return requestSWAPI(planet.get());
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"Planet not Found\"}");
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\":\"Internal Server Error\"}");
     }
   }
 
   public ResponseEntity getPlanetByName(String name) {
     try {
-      Planet planet = planetRepository.findByName(name);
+      Optional<Planet> planet = planetRepository.findByNameOpt(name);
 
-      if(planet == null) {
-        throw new Exception();
-      }
+      if (planet.isEmpty())
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"Planet not Found\"}");
 
-      return requestSWAPI(planet);
+      return requestSWAPI(planet.get());
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"Planet not Found\"}");
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\":\"Internal Server Error\"}");
     }
   }
 
-  public ResponseEntity<String> createPlanet(Planet planet) {
+  public synchronized ResponseEntity<String> createPlanet(Planet planet) {
     try {
       if (!checkPlanet(planet)) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\":\"Missing Information\"}");
@@ -76,7 +73,7 @@ public class PlanetService {
         return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"error\":\"Planet " + planet.getName() + " already exists\"}");
 
       List<Planet> planets = planetRepository.findAll();
-      planet.setId(new Integer(planets.size() + 1));
+      planet.setIndex(Integer.valueOf(planets.size() + 1));
       planetRepository.insert(planet);
       return ResponseEntity.status(HttpStatus.CREATED).body("{\"success\":\"Planet Created\"}");
     } catch (Exception e) {
@@ -84,9 +81,9 @@ public class PlanetService {
     }
   }
 
-  public ResponseEntity deletePlanet(Integer id) {
+  public ResponseEntity deletePlanet(Integer index) {
     try {
-      planetRepository.delete(planetRepository.findById(id));
+      planetRepository.delete(planetRepository.findByIndex(index));
       return ResponseEntity.status(HttpStatus.OK).body("{\"success\":\"Planet Deleted\"}");
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"Planet not Found\"}");
@@ -95,13 +92,13 @@ public class PlanetService {
 
   private ResponseEntity requestSWAPI(Planet planet) {
     try {
-      Object responseSWApi = restTemplate.exchange(SWAPI_URL + planet.getId(), HttpMethod.GET, headerGenerator(), Object.class);
+      Object responseSWApi = restTemplate.exchange(SWAPI_URL + planet.getIndex(), HttpMethod.GET, headerGenerator(), Object.class);
 
       JSONObject responseJson = new JSONObject(responseSWApi);
 
       JSONObject newPlanet = new JSONObject();
 
-      newPlanet.put("id", planet.getId());
+      newPlanet.put("index", planet.getIndex());
       newPlanet.put("name", planet.getName());
       newPlanet.put("climate", planet.getClimate());
       newPlanet.put("terrain", planet.getTerrain());

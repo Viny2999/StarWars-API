@@ -10,11 +10,15 @@ import java.util.Optional;
 
 @Repository
 public interface PlanetRepository extends MongoRepository<Planet, String> {
-  Planet findById(Integer id);
+  @Query(value = "{'index': ?0}")
+  Planet findByIndex(Integer index);
 
-  @Query(value = "{name: ?0}")
+  @Query(value = "{'index': ?0}")
+  Optional<Planet> findByIndexOpt(Integer index);
+
+  @Query(value = "{'name': ?0}")
   Planet findByName(String name);
 
-  @Query(value = "{name: ?0}")
+  @Query(value = "{'name': ?0}")
   Optional<Planet> findByNameOpt(String name);
 }
